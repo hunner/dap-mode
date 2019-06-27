@@ -55,6 +55,14 @@
                ("auto" (dap-go--populate-auto-args conf))
                ("debug" (dap--put-if-absent conf :program (lsp-find-session-folder (lsp-session) (buffer-file-name))))
                ("exec" (dap--put-if-absent conf :program (read-file-name "Select executable to debug.")))
+               ("connect"
+                (dap--put-if-absent conf :program (lsp-find-session-folder (lsp-session) (buffer-file-name)))
+                (dap--put-if-absent conf :host (string-to-number (read-string "Enter host: " "localhost")))
+                (dap--put-if-absent conf :port (string-to-number (read-string "Enter port: " "2345")))
+                (dap--put-if-absent conf :program-to-start
+                                    (concat dap-go-delve-path
+                                            " connect "
+                                            (format "%s:%d " (plist-get conf :host) (plist-get conf :port)))))
                ("remote"
                 (dap--put-if-absent conf :program (lsp-find-session-folder (lsp-session) (buffer-file-name)))
                 (dap--put-if-absent conf :port (string-to-number (read-string "Enter port: " "2345")))
@@ -121,6 +129,15 @@
                                    :request "launch"
                                    :name "Attach Executable"
                                    :mode "remote"
+                                   :program nil
+                                   :args nil
+                                   :env nil
+                                   :envFile nil))
+(dap-register-debug-template "Go Connect Server Configuration"
+                             (list :type "go"
+                                   :request "launch"
+                                   :name "Connect Server"
+                                   :mode "connect"
                                    :program nil
                                    :args nil
                                    :env nil
